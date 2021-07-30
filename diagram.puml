@@ -1,0 +1,90 @@
+@startuml diagram
+
+
+!include <logos/memcached>
+!include <logos/wordpress>
+!include <logos/mariadb>
+
+skinparam handwritten true
+skinparam sequenceArrowThickness 2
+skinparam roundcorner 10
+skinparam maxmessagesize 100
+skinparam sequenceParticipant underline
+
+skinparam maxCardWidth 200
+
+actor User << User >>
+agent Browser << Web or Mobile >>
+
+card Infrastructure {
+    card Gateway {
+        agent "<img:openresty-logo.png>" as OpenResty
+    }
+
+    card ktserver {
+        agent "<$memcached>" as  kt1
+        agent "<$memcached>" as  kt2
+        agent "<$memcached>" as  kt3
+    }
+
+    card WordPress {
+        agent "<$wordpress>" as  wp1
+        agent "<$wordpress>" as  wp2
+        agent "<$wordpress>" as  wp3
+        card "Shared Storage" {
+            agent "/var/www/html" as storage
+        }
+    }
+
+    card Database {
+        agent "<img:maxscale-logo.png>" as maxscale
+        card MariaDB {
+            agent "<$mariadb>" as  db1
+            agent "<$mariadb>" as  db2
+            agent "<$mariadb>" as  db3
+        }
+    }
+}
+
+User <-right-> Browser
+Browser <-right-> OpenResty
+
+OpenResty <-[#darkblue]-> wp1
+OpenResty <-[#darkblue]-> wp2
+OpenResty <-[#darkblue]-> wp3
+
+OpenResty <-[#darkgreen]-> ktserver
+
+wp1 <-[#blue]right-> kt1
+wp2 <-[#blue]right-> kt2
+wp3 <-[#blue]right-> kt3
+
+wp2 <-[#blue]right-> kt1
+wp2 <-[#blue]right-> kt2
+wp2 <-[#blue]right-> kt3
+
+wp3 <-[#blue]right-> kt1
+wp3 <-[#blue]right-> kt2
+wp3 <-[#blue]right-> kt3
+
+wp1 <-[#orange]-> maxscale
+wp2 <-[#orange]-> maxscale
+wp3 <-[#orange]-> maxscale
+
+wp1 <--> storage
+wp2 <--> storage
+wp3 <--> storage
+
+maxscale <-[#darkblue]-> db1
+maxscale <-[#darkblue]-> db2
+maxscale <-[#darkblue]-> db3
+
+db1 <-[#black]right-> db2
+db2 <-[#black]down-> db3
+db3 <-[#black]-> db1
+
+kt1 <-[#black]right-> kt2
+kt2 <-[#black]down-> kt3
+kt3 <-[#black]-> kt1
+
+@enduml
