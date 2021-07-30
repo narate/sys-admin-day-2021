@@ -8,7 +8,7 @@
 skinparam handwritten true
 skinparam sequenceArrowThickness 2
 skinparam roundcorner 10
-skinparam maxmessagesize 100
+skinparam maxmessagesize 100  
 skinparam sequenceParticipant underline
 
 skinparam maxCardWidth 200
